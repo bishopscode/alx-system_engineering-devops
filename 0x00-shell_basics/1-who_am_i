@@ -1,2 +1,0 @@
-#!/bin/bash
-echo "Effective username: $(who_am_i)"
