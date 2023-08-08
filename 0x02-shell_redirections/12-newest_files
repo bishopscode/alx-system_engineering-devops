@@ -1,2 +1,2 @@
 #!/bin/bash
-ls -lt | grep -E '^-' | awk '{print $9}' | head -n 10
+ls -t1 | head
