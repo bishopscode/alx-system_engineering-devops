@@ -1,2 +1,2 @@
 #!/bin/bash
- tr -d "cC"<F3>
+ tr -d "cC"
