@@ -1,2 +1,6 @@
 #!/usr/bin/env ruby
-puts ARGV[0].scan(/hbt+n/).join
+
+if ARGV.length == 1
+  puts ARGV[0].scan(/hbt+n/).join("")
+  exit
+end
