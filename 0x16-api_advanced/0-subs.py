@@ -1,6 +1,7 @@
 #!/usr/bin/python3
+
 """
-This script retrieves the number of subscribers for a given subreddit using the Reddit API.
+This module contains a function that queries the Reddit API and returns the number of subscribers (not active users, total subscribers) for a given subreddit.
 """
 
 import requests
@@ -13,25 +14,22 @@ def number_of_subscribers(subreddit):
         subreddit (str): The name of the subreddit.
 
     Returns:
-        int or None: The number of subscribers if successful, None otherwise.
+        int: The number of subscribers if successful, 0 otherwise.
     """
     if not isinstance(subreddit, str):
-        raise ValueError("Subreddit must be a string")
+        return 0
 
     user_agent = {'User-agent': 'Mozilla/5.0'}
     url = f'https://www.reddit.com/r/{subreddit}/about.json'
     
     try:
-        response = requests.get(url, headers=user_agent)
+        response = requests.get(url, headers=user_agent, allow_redirects=False)
         response.raise_for_status()  # Raise HTTPError for bad status codes
         data = response.json()
-        return data.get('data', {}).get('subscribers')
+        return data.get('data', {}).get('subscribers', 0)
     except requests.exceptions.RequestException as e:
         print(f"Error fetching data: {e}")
-        return None
+        return 0
     except KeyError as e:
         print(f"KeyError: {e}")
-        return None
-
-# Example usage:
-# print(number_of_subscribers("python"))  # Uncomment this line to test the function
+        return 0
