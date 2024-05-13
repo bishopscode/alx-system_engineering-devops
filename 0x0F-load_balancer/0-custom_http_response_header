@@ -1,23 +1,34 @@
 #!/usr/bin/env bash
-# Configure web-02 to be identical with web-01
-#an ubuntu machine to have a custom header X-Served-By
-
-# Update package information
+# configure web-02 to be identical to web-01
+# The name of the custom HTTP header must be X-Served-By
+# The value of the custom HTTP header must be the hostname of the server Nginx is running on
+# sudo sed -i 's/server_name _;.*/server_name _;\n\tadd_header X-Served-By \$hostname;/' /etc/nginx/sites-enabled/default 
 sudo apt-get -y update
-
-# Install Nginx
 sudo apt-get -y install nginx
+sudo ufw allow 'Nginx HTTP'
+sudo mkdir -p /var/www/html /var/www/error
+sudo chmod -R 755 /var/www
+echo 'Hello World!' > /var/www/html/index.html
+echo "Ceci n'est pas une page" > /var/www/html/404.html
+server_config=\
+"server {
+	listen 80 default_server;
+	listen [::]:80 default_server;
+	root /var/www/html;
+	index index.html index.htm index.nginx-debian.html;
+	server_name _;
+	add_header X-Served-By \$hostname;
+	location / {
+		try_files \$uri \$uri/ =404;
+	}
+	if (\$request_filename ~ redirect_me){
+		rewrite ^ https://youtube.com permanent;
+	}
+	error_page 404 /404.html;
+	location = /404.html {
+		internal;
+	}
+}"
 
-# Create simple HTML files
-echo "Hello World!" | sudo tee /var/www/html/index.html
-echo "Ceci n'est pas une page" | sudo tee /var/www/html/404.html
-
-# Create Nginx configuration snippet
-new_config="add_header X-Served-By \$hostname;\n\tlocation /redirect_me {\n\t\treturn 301 https://www.youtube.com/watch?v=QH2-TGUlwu4;\n\t}\n\n\terror_page 404 /custom_404.html;\n\tlocation = /custom_404.html {\n\t\tinternal;\n\t}\n"
-
-# Update Nginx configuration
-sudo sed -i "/server_name _;/c\\$new_config" /etc/nginx/sites-enabled/default
-# sudo sed -i "s#server_name _;#$new_config#" /etc/nginx/sites-enabled/default
-
-# Restart Nginx to apply changes
+echo "$server_config" > /etc/nginx/sites-enabled/default
 sudo service nginx restart
