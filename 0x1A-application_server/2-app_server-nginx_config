@@ -1,6 +1,6 @@
 server {
     listen 80;
-    server_name your_domain_or_ip;
+    server_name 35.153.57.5;
 
 # Customize HTTP response header
     add_header X-Served-By 503132-web-01;
